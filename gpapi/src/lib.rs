@@ -92,7 +92,7 @@ use googleplay_protobuf::{
     UploadDeviceConfigResponse,
 };
 
-use serde::{Serialize, Deserialize};
+use bincode::{Encode, Decode};
 include!("device_properties.rs");
 
 static DEVICES_ENCODED: &[u8] = include_bytes!("device_properties.bin");
@@ -131,8 +131,13 @@ impl Gpapi {
         Gpapi {
             locale: String::from("en_US"),
             timezone: String::from("UTC"),
-            device_properties: bincode::deserialize::<HashMap<String, EncodedDeviceProperties>>(DEVICES_ENCODED)
-                .unwrap()
+            device_properties:
+                bincode::
+                borrow_decode_from_slice::
+                <HashMap<String, EncodedDeviceProperties>, bincode::config::Configuration>(
+                    DEVICES_ENCODED,
+                    bincode::config::standard())
+                .unwrap().0
                 .remove(&device_codename.into())
                 .expect("Invalid device codename").to_decoded(),
             email: email.into(),

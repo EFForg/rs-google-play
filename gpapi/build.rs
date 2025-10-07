@@ -8,7 +8,7 @@ use prost::Message;
 
 use googleplay_protobuf::{AndroidBuildProto, AndroidCheckinProto, DeviceConfigurationProto, DeviceFeature};
 
-use serde::{Serialize, Deserialize};
+use bincode::{Encode, Decode};
 include!("src/device_properties.rs");
 
 fn main() {
@@ -151,7 +151,7 @@ fn main() {
             device_properties_map.insert(section.replace("gplayapi_", "").replace(".properties", ""), device_properties_encoded);
         }
 
-        let devices_encoded: Vec<u8> = bincode::serialize(&device_properties_map).unwrap();
+        let devices_encoded: Vec<u8> = bincode::encode_to_vec(&device_properties_map, bincode::config::standard()).unwrap();
 
         let mut file = File::create("src/device_properties.bin").unwrap();
         file.write_all(&devices_encoded).unwrap();
