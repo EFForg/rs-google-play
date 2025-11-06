@@ -51,7 +51,7 @@
 //! let download_info = api.get_download_info("com.instagram.android", None).await;
 //! println!("{:?}", download_info);
 //!
-//! api.download("com.instagram.android", None, true, true, &Path::new("/tmp/testing"), None).await;
+//! api.download("com.instagram.android", None, true, true, true, &Path::new("/tmp/testing"), None).await;
 //! # }
 //! ```
 
@@ -100,7 +100,8 @@ static DEVICES_ENCODED: &[u8] = include_bytes!("device_properties.bin");
 type MainAPKDownloadURL = Option<String>;
 type SplitsDownloadInfo = Vec<(Option<String>, Option<String>)>;
 type AdditionalFilesDownloadInfo = Vec<(Option<String>, Option<String>)>;
-type DownloadInfo = (MainAPKDownloadURL, SplitsDownloadInfo, AdditionalFilesDownloadInfo);
+type DexMetadataURL = Option<String>;
+type DownloadInfo = (MainAPKDownloadURL, SplitsDownloadInfo, AdditionalFilesDownloadInfo, DexMetadataURL);
 
 #[derive(Debug)]
 pub struct Gpapi {
@@ -261,6 +262,7 @@ impl Gpapi {
         pkg_name: S,
         version_code: Option<i32>,
         split_if_available: bool,
+        dex_metadata_if_available: bool,
         include_additional_files: bool,
         dst_path: &Path,
         cb: Option<&Box<dyn Fn(String, u64) -> Box<dyn Fn(u64) -> ()>>>,
@@ -273,7 +275,8 @@ impl Gpapi {
         let mut dst_path = PathBuf::from(dst_path);
         if dst_path.is_dir() {
             if (split_if_available && download_info.1.len() > 0) ||
-               (include_additional_files && download_info.2.len() > 0){
+               (include_additional_files && download_info.2.len() > 0) ||
+               (dex_metadata_if_available && download_info.3.is_some()) {
                 dst_path.push(pkg_name.clone());
                 if dst_path.is_dir() {
                     return Err(GpapiError::new(GpapiErrorKind::DirectoryExists));
@@ -316,6 +319,19 @@ impl Gpapi {
             }
         }
 
+        if dex_metadata_if_available {
+            if let Some(dex_metadata_url) = download_info.3 {
+                let filename = format!("{}.dm", pkg_name);
+                let dl = AsyncDownload::new(&dex_metadata_url, &dst_path, &filename).get().await?;
+                let length = dl.length();
+                let cb = match length {
+                    Some(length) => cb.map(|c| c(filename.clone(), length)),
+                    None => None,
+                };
+                downloads.push((dl, cb));
+            }
+        }
+
         let filename = format!("{}.apk", pkg_name);
         if let Some(download_url) = download_info.0 {
             let dl = AsyncDownload::new(&download_url, &dst_path, &filename).get().await?;
@@ -345,7 +361,8 @@ impl Gpapi {
     /// * An Option<String> to the full APK download URL, followed by a Vec<(Option<String>,
     /// Option<String>)> which corresponds to a list of download URLs and names for the split APK,
     /// then followed by another Vec<(Option<String>, Option<String>)> which corresponds to the
-    /// download URLs and filenames for additional files.
+    /// download URLs and filenames for additional files and finally an Option<String> that
+    /// contains the URL for the dexmetadata file.
     pub async fn get_download_info<S: Into<String>>(
         &self,
         pkg_name: S,
@@ -432,7 +449,10 @@ impl Gpapi {
                             }
                         }
                     }
-                    return Ok((app_delivery_data.download_url, splits, additional_files));
+                    let dex_metadata_url = if let Some(dex_metadata) = app_delivery_data.dex_metadata {
+                        dex_metadata.download_url
+                    } else { None };
+                    return Ok((app_delivery_data.download_url, splits, additional_files, dex_metadata_url));
                 }
             }
         }

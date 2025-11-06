@@ -40,6 +40,8 @@ pub struct AndroidAppDeliveryData {
     pub compressed_app_data: ::core::option::Option<CompressedAppData>,
     #[prost(string, optional, tag = "19")]
     pub sha256: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(message, optional, tag = "21")]
+    pub dex_metadata: ::core::option::Option<DexMetadata>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -84,6 +86,16 @@ pub struct CompressedAppData {
     pub r#type: ::core::option::Option<i64>,
     #[prost(int64, optional, tag = "2")]
     pub size: ::core::option::Option<i64>,
+    #[prost(string, optional, tag = "3")]
+    pub download_url: ::core::option::Option<::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DexMetadata {
+    #[prost(int64, optional, tag = "1")]
+    pub download_size: ::core::option::Option<i64>,
+    #[prost(string, optional, tag = "2")]
+    pub sha256: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(string, optional, tag = "3")]
     pub download_url: ::core::option::Option<::prost::alloc::string::String>,
 }
