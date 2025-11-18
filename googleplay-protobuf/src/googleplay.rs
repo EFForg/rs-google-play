@@ -1705,8 +1705,8 @@ pub struct AppDetails {
     pub developer_name: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(int32, optional, tag = "2")]
     pub major_version_number: ::core::option::Option<i32>,
-    #[prost(int32, optional, tag = "3")]
-    pub version_code: ::core::option::Option<i32>,
+    #[prost(int64, optional, tag = "3")]
+    pub version_code: ::core::option::Option<i64>,
     #[prost(string, optional, tag = "4")]
     pub version_string: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(string, optional, tag = "5")]
@@ -1785,6 +1785,10 @@ pub struct AppDetails {
     pub download_count: ::core::option::Option<i64>,
     #[prost(string, optional, tag = "61")]
     pub download_label_display: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(message, optional, tag = "64")]
+    pub app_launch: ::core::option::Option<AppLaunch>,
+    #[prost(message, optional, tag = "66")]
+    pub tag_group: ::core::option::Option<TagGroup>,
     #[prost(string, optional, tag = "67")]
     pub in_app_product: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(string, optional, tag = "77")]
@@ -1795,6 +1799,89 @@ pub struct AppDetails {
     pub download_label: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(message, optional, tag = "82")]
     pub compatibility: ::core::option::Option<Compatibility>,
+    #[prost(message, optional, tag = "86")]
+    pub support: ::core::option::Option<Support>,
+}
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct AppLaunch {
+    #[prost(string, optional, tag = "1")]
+    pub date: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(message, optional, tag = "2")]
+    pub time: ::core::option::Option<app_launch::Time>,
+}
+/// Nested message and enum types in `AppLaunch`.
+pub mod app_launch {
+    #[derive(Clone, Copy, PartialEq, Eq, Hash, ::prost::Message)]
+    pub struct Time {
+        #[prost(int64, optional, tag = "1")]
+        pub timestamp: ::core::option::Option<i64>,
+        /// nanoseconds?
+        #[prost(int64, optional, tag = "2")]
+        pub unknown: ::core::option::Option<i64>,
+    }
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TagGroup {
+    /// Lazy to guess the type names, please adjust if needed.
+    #[prost(message, optional, tag = "1")]
+    pub type1: ::core::option::Option<TagType>,
+    #[prost(message, optional, tag = "2")]
+    pub type2: ::core::option::Option<TagType>,
+    #[prost(message, optional, tag = "3")]
+    pub type3: ::core::option::Option<TagType>,
+    #[prost(message, optional, tag = "4")]
+    pub type4: ::core::option::Option<TagType>,
+    #[prost(message, optional, tag = "5")]
+    pub type5: ::core::option::Option<TagType>,
+    #[prost(message, optional, tag = "6")]
+    pub type6: ::core::option::Option<TagType>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TagType {
+    #[prost(message, repeated, tag = "1")]
+    pub entries: ::prost::alloc::vec::Vec<TagEntry>,
+}
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct TagEntry {
+    #[prost(string, optional, tag = "1")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(message, optional, tag = "2")]
+    pub metadata: ::core::option::Option<TagMetadata>,
+    #[prost(string, optional, tag = "3")]
+    pub category: ::core::option::Option<::prost::alloc::string::String>,
+}
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct TagMetadata {
+    #[prost(oneof = "tag_metadata::Metadata", tags = "3, 4")]
+    pub metadata: ::core::option::Option<tag_metadata::Metadata>,
+}
+/// Nested message and enum types in `TagMetadata`.
+pub mod tag_metadata {
+    #[derive(Clone, PartialEq, Eq, Hash, ::prost::Oneof)]
+    pub enum Metadata {
+        #[prost(message, tag = "3")]
+        Category(super::TagData),
+        #[prost(message, tag = "4")]
+        Search(super::TagData),
+    }
+}
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct TagData {
+    #[prost(string, optional, tag = "1")]
+    pub url: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag = "2")]
+    pub label: ::core::option::Option<::prost::alloc::string::String>,
+}
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct Support {
+    #[prost(string, optional, tag = "1")]
+    pub developer_name: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag = "2")]
+    pub developer_email: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag = "3")]
+    pub developer_address: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag = "4")]
+    pub developer_phone_number: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Compatibility {
@@ -1828,6 +1915,8 @@ pub struct PublisherStream {
     pub more_url: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(string, optional, tag = "11")]
     pub query: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag = "83")]
+    pub browse_url: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct EditorChoice {
@@ -1879,8 +1968,8 @@ pub struct Dependency {
 pub struct LibraryDependency {
     #[prost(string, optional, tag = "1")]
     pub package_name: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(int32, optional, tag = "2")]
-    pub version_code: ::core::option::Option<i32>,
+    #[prost(int64, optional, tag = "2")]
+    pub version_code: ::core::option::Option<i64>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TestingProgramInfo {
@@ -1961,8 +2050,8 @@ pub struct Bucket {
 pub struct ListResponse {
     #[prost(message, repeated, tag = "1")]
     pub bucket: ::prost::alloc::vec::Vec<Bucket>,
-    #[prost(message, repeated, tag = "2")]
-    pub item: ::prost::alloc::vec::Vec<Item>,
+    #[prost(message, optional, tag = "2")]
+    pub item: ::core::option::Option<Item>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Item {
@@ -2134,8 +2223,8 @@ pub struct Annotations {
     pub suggestion_reasons: ::core::option::Option<SuggestionReasons>,
     #[prost(message, optional, tag = "20")]
     pub optimal_device_class_warning: ::core::option::Option<Warning>,
-    #[prost(message, repeated, tag = "21")]
-    pub badge_container: ::prost::alloc::vec::Vec<BadgeContainer>,
+    #[prost(message, optional, tag = "21")]
+    pub badge_container: ::core::option::Option<BadgeContainer>,
     #[prost(message, optional, tag = "22")]
     pub section_suggest_for_rating: ::core::option::Option<SectionMetaData>,
     #[prost(message, optional, tag = "24")]
@@ -2446,6 +2535,8 @@ pub struct Stream {
     pub stream: ::core::option::Option<SubStream>,
     #[prost(string, optional, tag = "3")]
     pub subtitle: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag = "83")]
+    pub browse_url: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct SubStream {
@@ -3109,8 +3200,8 @@ pub struct ModuleDeliveryResponse {}
 pub struct PreFetch {
     #[prost(string, optional, tag = "1")]
     pub url: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(message, optional, tag = "2")]
-    pub response: ::core::option::Option<ResponseWrapper>,
+    #[prost(message, optional, boxed, tag = "2")]
+    pub response: ::core::option::Option<::prost::alloc::boxed::Box<ResponseWrapper>>,
     #[prost(string, optional, tag = "3")]
     pub etag: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(int64, optional, tag = "4")]
@@ -3148,8 +3239,8 @@ pub struct ResponseWrapper {
     pub payload: ::core::option::Option<Payload>,
     #[prost(message, optional, tag = "2")]
     pub commands: ::core::option::Option<ServerCommands>,
-    #[prost(message, repeated, tag = "3")]
-    pub pre_fetch: ::prost::alloc::vec::Vec<PreFetch>,
+    #[prost(message, optional, boxed, tag = "3")]
+    pub pre_fetch: ::core::option::Option<::prost::alloc::boxed::Box<PreFetch>>,
     #[prost(message, repeated, tag = "4")]
     pub notification: ::prost::alloc::vec::Vec<Notification>,
     #[prost(message, optional, tag = "5")]

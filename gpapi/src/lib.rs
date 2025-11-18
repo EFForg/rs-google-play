@@ -260,7 +260,7 @@ impl Gpapi {
     pub async fn download<S: Into<String>>(
         &self,
         pkg_name: S,
-        version_code: Option<i32>,
+        version_code: Option<i64>,
         split_if_available: bool,
         dex_metadata_if_available: bool,
         include_additional_files: bool,
@@ -366,7 +366,7 @@ impl Gpapi {
     pub async fn get_download_info<S: Into<String>>(
         &self,
         pkg_name: S,
-        mut version_code: Option<i32>,
+        mut version_code: Option<i64>,
     ) -> Result<DownloadInfo, GpapiError> {
         let pkg_name = pkg_name.into();
         if self.auth_token.is_none() {
@@ -408,7 +408,7 @@ impl Gpapi {
     async fn delivery<S: Into<String>>(
         &self,
         pkg_name: S,
-        mut version_code: Option<i32>,
+        mut version_code: Option<i64>,
         delivery_token: S,
     ) -> Result<DownloadInfo, GpapiError> {
         let pkg_name = pkg_name.into();
@@ -459,7 +459,7 @@ impl Gpapi {
         Err(GpapiError::new(GpapiErrorKind::InvalidApp))
     }
 
-    async fn get_latest_version_for_pkg_name(&self, pkg_name: &str) -> Result<i32, GpapiError> {
+    async fn get_latest_version_for_pkg_name(&self, pkg_name: &str) -> Result<i64, GpapiError> {
         if let Some(details) = self.details(pkg_name).await? {
             if let Some(item) = details.item {
                 if let Some(details) = item.details {

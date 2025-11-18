@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2020-2023 Aurora OSS
+ * SPDX-FileCopyrightText: 2023-2024 The Calyx Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 syntax = "proto2";
 
 option java_package = "com.aurora.gplayapi";
@@ -985,7 +991,7 @@ message PlusPerson {
 message AppDetails {
   optional string developerName = 1;
   optional int32 majorVersionNumber = 2;
-  optional int32 versionCode = 3;
+  optional int64 versionCode = 3;
   optional string versionString = 4;
   optional string title = 5;
   repeated string appCategory = 7;
@@ -1023,10 +1029,62 @@ message AppDetails {
   optional string categoryName = 48;
   optional int64 downloadCount = 53;
   optional string downloadLabelDisplay = 61;
+  optional AppLaunch appLaunch = 64;
+  optional TagGroup tagGroup = 66;
   optional string inAppProduct = 67;
   optional string downloadLabelAbbreviated = 77;
   optional string downloadLabel = 78;
   optional Compatibility compatibility = 82;
+  optional Support support = 86;
+}
+
+message AppLaunch {
+  optional string date = 1;
+  optional Time time = 2;
+
+  message Time {
+      optional int64 timestamp = 1;
+      optional int64 unknown = 2; // nanoseconds?
+  }
+}
+
+message TagGroup {
+  // Lazy to guess the type names, please adjust if needed.
+  optional TagType type1 = 1;
+  optional TagType type2 = 2;
+  optional TagType type3 = 3;
+  optional TagType type4 = 4;
+  optional TagType type5 = 5;
+  optional TagType type6 = 6;
+}
+
+message TagType {
+  repeated TagEntry entries = 1;
+}
+
+message TagEntry {
+  optional string name = 1;
+  optional TagMetadata metadata = 2;
+  optional string category = 3;
+}
+
+message TagMetadata {
+  oneof metadata {
+    TagData category = 3;
+    TagData search = 4;
+  }
+}
+
+message TagData {
+  optional string url = 1;
+  optional string label = 2;
+}
+
+message Support {
+  optional string developerName = 1;
+  optional string developerEmail = 2;
+  optional string developerAddress = 3;
+  optional string developerPhoneNumber = 4;
 }
 
 message Compatibility {
@@ -1051,6 +1109,7 @@ message Publisher{
 message PublisherStream{
   optional string moreUrl = 3;
   optional string query = 11;
+  optional string browseUrl = 83;
 }
 
 message EditorChoice{
@@ -1084,7 +1143,7 @@ message Dependency {
 
 message LibraryDependency {
   optional string packageName = 1;
-  optional int32 versionCode = 2;
+  optional int64 versionCode = 2;
 }
 
 
@@ -1138,7 +1197,7 @@ message Bucket {
 
 message ListResponse {
   repeated Bucket bucket = 1;
-  repeated Item item = 2;
+  optional Item item = 2;
 }
 
 message Item {
@@ -1230,7 +1289,7 @@ message Annotations {
   optional string privacyPolicyUrl = 18;
   optional SuggestionReasons suggestion_reasons = 19;
   optional Warning optimalDeviceClassWarning = 20;
-  repeated BadgeContainer badgeContainer = 21;
+  optional BadgeContainer badgeContainer = 21;
   optional SectionMetaData sectionSuggestForRating = 22;
   optional SectionMetaData sectionPurchaseCrossSell = 24;
   repeated OverflowLink overflowLink = 25;
@@ -1425,6 +1484,7 @@ message Stream{
   optional string title = 1;
   optional SubStream stream = 2;
   optional string subtitle = 3;
+  optional string browseUrl = 83;
 }
 
 message SubStream{
@@ -1871,7 +1931,7 @@ message ServerCookies {
 message ResponseWrapper {
   optional Payload payload = 1;
   optional ServerCommands commands = 2;
-  repeated PreFetch preFetch = 3;
+  optional PreFetch preFetch = 3;
   repeated Notification notification = 4;
   optional ServerMetadata serverMetadata = 5;
   optional Targets targets = 6;
