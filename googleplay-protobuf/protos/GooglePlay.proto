@@ -23,7 +23,7 @@ message AndroidAppDeliveryData {
   optional int64 type = 17;
   optional CompressedAppData compressedAppData = 18;
   optional string sha256 = 19;
-  optional DexMetadata dexMetadata = 21
+  optional DexMetadata dexMetadata = 21;
 }
 
 message SplitDeliveryData {
