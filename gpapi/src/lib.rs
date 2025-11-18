@@ -1191,7 +1191,7 @@ mod tests {
                 let mut api = Gpapi::new("px_7a", &email);
                 api.set_aas_token(aas_token);
                 if api.login().await.is_ok() {
-                    assert!(api.download("com.instagram.android", None, true, true, &Path::new("/tmp/testing"), None).await.is_ok());
+                    assert!(api.download("com.instagram.android", None, true, true, false, &Path::new("/tmp/testing"), None).await.is_ok());
                 }
             }
         }
