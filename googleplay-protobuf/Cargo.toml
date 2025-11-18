@@ -1,6 +1,6 @@
 [package]
 name = "googleplay-protobuf"
-version = "2.2.0"
+version = "3.0.0"
 authors = ["Bill Budington <bill@eff.org>"]
 build = "build.rs"
 license = "MIT"
