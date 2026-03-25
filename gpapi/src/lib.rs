@@ -170,6 +170,13 @@ impl Gpapi {
         self.aas_token = Some(aas_token.into());
     }
 
+    /// Set the auth token directly. This is useful when you have an AUTH token (e.g., from Aurora
+    /// dispenser) and want to skip the AAS token flow. When an auth token is set, the login flow
+    /// will skip requesting a new auth token.
+    pub fn set_auth_token<S: Into<String>>(&mut self, auth_token: S) {
+        self.auth_token = Some(auth_token.into());
+    }
+
     /// Request and set the aas token given an oauth token and the associated email.
     ///
     /// # Arguments
@@ -217,8 +224,17 @@ impl Gpapi {
         self.aas_token.as_ref().map(|token| token.as_str())
     }
 
-    /// Log in to Google's Play Store API.  This is required for most other actions. The aas token
-    /// has to be set via `request_aas_token` or `set_aas_token` first.
+    /// Get the auth token that has been previously set by either `set_auth_token` or obtained
+    /// during the login flow via `request_auth_token`.
+    pub fn get_auth_token(&self) -> Option<&str> {
+        self.auth_token.as_ref().map(|token| token.as_str())
+    }
+
+    /// Log in to Google's Play Store API.  This is required for most other actions.
+    /// 
+    /// You must set either:
+    /// - An AAS token via `request_aas_token` or `set_aas_token` (which will be used to obtain an AUTH token), or
+    /// - An AUTH token directly via `set_auth_token` (which skips the AAS token flow)
     pub async fn login(
         &mut self,
     ) -> Result<(), GpapiError> {
@@ -226,7 +242,12 @@ impl Gpapi {
         if let Some(upload_device_config_token) = self.upload_device_config().await? {
             self.device_config_token =
                 Some(upload_device_config_token.upload_device_config_token.unwrap());
-            self.request_auth_token().await?;
+            
+            // Only request auth token if we don't already have one
+            if self.auth_token.is_none() {
+                self.request_auth_token().await?;
+            }
+            
             self.toc().await?;
             Ok(())
         } else {
@@ -790,7 +811,7 @@ impl Gpapi {
         Ok(())
     }
 
-    async fn toc(&mut self) -> Result<(), Box<dyn Error>>{
+    async fn toc(&mut self) -> Result<(), GpapiError> {
         let resp = self
             .execute_request("toc", None, None, self.get_default_headers()?)
             .await?;
@@ -799,17 +820,19 @@ impl Gpapi {
             .toc_response.ok_or(GpapiError::from("Invalid toc response."))?;
         if toc_response.tos_token.is_some() || toc_response.tos_content.is_some() {
             self.tos_token = toc_response.tos_token.clone();
-            return Err(Box::new(GpapiError::new(GpapiErrorKind::TermsOfService)));
+            return Err(GpapiError::new(GpapiErrorKind::TermsOfService));
         }
         if let Some(cookie) = toc_response.cookie {
             self.dfe_cookie = Some(cookie.clone());
             Ok(())
         } else {
-            Err("No DFE cookie found.".into())
+            Err(GpapiError::from("No DFE cookie found."))
         }
     }
 
     /// Accept the play store terms of service.
+    /// This should be called after login() returns a TermsOfService error.
+    /// After calling this, the API should be ready for use.
     pub async fn accept_tos(&mut self) -> Result<Option<AcceptTosResponse>, Box<dyn Error>>{
         if let Some(tos_token) = &self.tos_token {
             let form_body = {
@@ -822,6 +845,7 @@ impl Gpapi {
             let resp = self
                 .execute_request("acceptTos", None, Some(&form_body.into_bytes()), self.get_default_headers()?)
                 .await?;
+            
             if let Some(payload) = resp.payload {
                 Ok(payload.accept_tos_response)
             } else {
