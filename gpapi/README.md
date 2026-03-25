@@ -10,12 +10,16 @@ A library for interacting with the Google Play API.
 
 ## Getting Started
 
-To interact with the API, first you'll have to obtain an OAuth token by visiting the Google
+There are two ways to authenticate with the Google Play API:
+
+### Option 1: Using OAuth Token (recommended for personal accounts)
+
+First, obtain an OAuth token by visiting the Google
 [embedded setup page](https://accounts.google.com/EmbeddedSetup/identifier?flowName=EmbeddedSetupAndroid)
 and opening the browser debugging console, logging in, and looking for the `oauth_token` cookie
-being set on your browser.  It will be present in the last requests being made and start with
-"oauth2_4/".  Copy this value.  It can only be used once, in order to obtain the `aas_token`,
-which can be used subsequently.  To obtain this token:
+being set on your browser. It will be present in the last requests being made and start with
+"oauth2_4/". Copy this value. It can only be used once, in order to obtain the `aas_token`,
+which can be used subsequently. To obtain this token:
 
 ```rust
 use gpapi::Gpapi;
@@ -23,12 +27,12 @@ use gpapi::Gpapi;
 #[tokio::main]
 async fn main() {
     let mut api = Gpapi::new("ad_g3_pro", &email);
-    println!("{:?}", api.request_aas_token(oauth_token).await);
+    api.request_aas_token(oauth_token).await.unwrap();
+    println!("{:?}", api.get_aas_token());
 }
 ```
 
-Now, you can begin interacting with the API by initializing it setting the `aas_token` and
-logging in.
+Now, you can begin interacting with the API by setting the `aas_token` and logging in.
 
 ```rust
 use gpapi::Gpapi;
@@ -37,10 +41,29 @@ use gpapi::Gpapi;
 async fn main() {
     let mut api = Gpapi::new("px_7a", &email);
     api.set_aas_token(aas_token);
-    api.login().await;
+    api.login().await.unwrap();
     // do something
 }
 ```
+
+### Option 2: Using AUTH Token directly (for token dispensers)
+
+If you have an AUTH token (e.g., from Aurora Store's token dispenser), you can use it directly
+without going through the OAuth/AAS token flow:
+
+```rust
+use gpapi::Gpapi;
+
+#[tokio::main]
+async fn main() {
+    let mut api = Gpapi::new("px_7a", &email);
+    api.set_auth_token(auth_token); // AUTH tokens typically start with "ya29."
+    api.login().await.unwrap();
+    // do something
+}
+```
+
+## Downloading Apps
 
 From here, you can get package details, get the info to download a package, or use the library to download it.
 
@@ -51,7 +74,7 @@ println!("{:?}", details);
 let download_info = api.get_download_info("com.instagram.android", None).await;
 println!("{:?}", download_info);
 
-api.download("com.instagram.android", None, true, true, &Path::new("/tmp/testing"), None).await;
+api.download("com.instagram.android", None, true, true, true, &Path::new("/tmp/testing"), None).await;
 ```
 
 ## Docs
