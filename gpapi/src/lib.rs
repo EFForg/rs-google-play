@@ -1030,6 +1030,10 @@ impl Default for AuthRequest {
             String::from("callerSig"),
             String::from(consts::defaults::DEFAULT_CALLER_SIG)
         );
+        params.insert(
+            String::from("droidguard_results"),
+            String::from("null")
+        );
         AuthRequest {
             params,
         }
