@@ -23,7 +23,8 @@ use gpapi::Gpapi;
 #[tokio::main]
 async fn main() {
     let mut api = Gpapi::new("ad_g3_pro", &email);
-    println!("{:?}", api.request_aas_token(oauth_token).await);
+    api.request_aas_token(oauth_token).await.unwrap();
+    println!("{:?}", api.get_aas_token());
 }
 ```
 
@@ -37,7 +38,7 @@ use gpapi::Gpapi;
 async fn main() {
     let mut api = Gpapi::new("px_7a", &email);
     api.set_aas_token(aas_token);
-    api.login().await;
+    api.login().await.unwrap();
     // do something
 }
 ```
@@ -51,7 +52,7 @@ println!("{:?}", details);
 let download_info = api.get_download_info("com.instagram.android", None).await;
 println!("{:?}", download_info);
 
-api.download("com.instagram.android", None, true, true, &Path::new("/tmp/testing"), None).await;
+api.download("com.instagram.android", None, true, true, true, &Path::new("/tmp/testing"), None).await;
 ```
 
 ## Docs

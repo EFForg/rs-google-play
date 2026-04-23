@@ -11,6 +11,7 @@ repository = "https://github.com/EFForg/rs-google-play/tree/master/gpapi"
 
 [lib]
 doctest = false
+path = "src/lib.rs"
 
 [dependencies]
 prost = "0.14"
