@@ -15,7 +15,7 @@ There are two ways to authenticate with the Google Play API:
 ### Option 1: Using OAuth Token (recommended for personal accounts)
 
 First, obtain an OAuth token by visiting the Google
-[embedded setup page](https://accounts.google.com/EmbeddedSetup/identifier?flowName=EmbeddedSetupAndroid)
+[embedded setup page](https://accounts.google.com/EmbeddedSetup)
 and opening the browser debugging console, logging in, and looking for the `oauth_token` cookie
 being set on your browser. It will be present in the last requests being made and start with
 "oauth2_4/". Copy this value. It can only be used once, in order to obtain the `aas_token`,
