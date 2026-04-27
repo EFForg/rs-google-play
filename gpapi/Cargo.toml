@@ -15,10 +15,8 @@ path = "src/lib.rs"
 
 [dependencies]
 prost = "0.14"
-reqwest = "0.12"
+reqwest = "0.13"
 bytes = "1"
-#hyper = { version = "0.14", features = ["full"] }
-#hyper-tls = "0.5"
 googleplay-protobuf = "3"
 bincode = "2"
 futures = "0.3"
