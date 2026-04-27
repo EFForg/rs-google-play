@@ -18,7 +18,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() {
-//!     let mut api = Gpapi::new("ad_g3_pro", &email);
+//!     let mut api = Gpapi::new("sm_a13_5g", &email);
 //!     api.request_aas_token(oauth_token).await.unwrap();
 //!     println!("{:?}", api.get_aas_token());
 //! }
@@ -31,7 +31,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() {
-//!     let mut api = Gpapi::new("px_7a", &email);
+//!     let mut api = Gpapi::new("px_9a", &email);
 //!     api.set_aas_token(aas_token);
 //!     api.login().await.unwrap();
 //!     // do something
@@ -48,7 +48,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() {
-//!     let mut api = Gpapi::new("px_7a", &email);
+//!     let mut api = Gpapi::new("px_9a", &email);
 //!     api.set_auth_token(auth_token); // AUTH tokens typically start with "ya29."
 //!     api.login().await.unwrap();
 //!     // do something
@@ -64,7 +64,7 @@
 //! # use std::path::Path;
 //! # #[tokio::main]
 //! # async fn main() {
-//! # let mut api = Gpapi::new("px_7a", &email);
+//! # let mut api = Gpapi::new("px_9a", &email);
 //! # api.set_aas_token(aas_token);
 //! # api.login().await.unwrap();
 //! let details = api.details("com.instagram.android").await;
@@ -1190,7 +1190,7 @@ mod tests {
         #[tokio::test]
         async fn test_login() {
             if let (Ok(email), Ok(aas_token)) = (env::var("EMAIL"), env::var("AAS_TOKEN")) {
-                let mut api = Gpapi::new("px_7a", &email);
+                let mut api = Gpapi::new("px_9a", &email);
                 api.set_aas_token(aas_token);
                 assert!(api.login().await.is_ok());
                 assert!(api.device_checkin_consistency_token.is_some());
@@ -1204,7 +1204,7 @@ mod tests {
         #[tokio::test]
         async fn test_details() {
             if let (Ok(email), Ok(aas_token)) = (env::var("EMAIL"), env::var("AAS_TOKEN")) {
-                let mut api = Gpapi::new("px_7a", &email);
+                let mut api = Gpapi::new("px_9a", &email);
                 api.set_aas_token(aas_token);
                 if api.login().await.is_ok() {
                     assert!(api.details("com.viber.voip").await.is_ok());
@@ -1215,7 +1215,7 @@ mod tests {
         #[tokio::test]
         async fn test_bulk_details() {
             if let (Ok(email), Ok(aas_token)) = (env::var("EMAIL"), env::var("AAS_TOKEN")) {
-                let mut api = Gpapi::new("px_7a", &email);
+                let mut api = Gpapi::new("px_9a", &email);
                 api.set_aas_token(aas_token);
                 if api.login().await.is_ok() {
                     let pkg_names = ["com.viber.voip", "com.instagram.android"];
@@ -1227,7 +1227,7 @@ mod tests {
         #[tokio::test]
         async fn test_get_download_info() {
             if let (Ok(email), Ok(aas_token)) = (env::var("EMAIL"), env::var("AAS_TOKEN")) {
-                let mut api = Gpapi::new("px_7a", &email);
+                let mut api = Gpapi::new("px_9a", &email);
                 api.set_aas_token(aas_token);
                 if api.login().await.is_ok() {
                     assert!(api.get_download_info("com.viber.voip", None).await.is_ok());
@@ -1238,7 +1238,7 @@ mod tests {
         #[tokio::test]
         async fn test_download() {
             if let (Ok(email), Ok(aas_token)) = (env::var("EMAIL"), env::var("AAS_TOKEN")) {
-                let mut api = Gpapi::new("px_7a", &email);
+                let mut api = Gpapi::new("px_9a", &email);
                 api.set_aas_token(aas_token);
                 if api.login().await.is_ok() {
                     assert!(api.download("com.instagram.android", None, true, true, false, &Path::new("/tmp/testing"), None).await.is_ok());
