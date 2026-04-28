@@ -295,7 +295,7 @@ impl Gpapi {
     }
 
     /// Log in to Google's Play Store API.  This is required for most other actions.
-    /// 
+    ///
     /// You must set either:
     /// - An AAS token via `request_aas_token` or `set_aas_token` (which will be used to obtain an AUTH token), or
     /// - An AUTH token directly via `set_auth_token` (which skips the AAS token flow)
@@ -306,12 +306,12 @@ impl Gpapi {
         if let Some(upload_device_config_token) = self.upload_device_config().await? {
             self.device_config_token =
                 Some(upload_device_config_token.upload_device_config_token.unwrap());
-            
+
             // Only request auth token if we don't already have one
             if self.auth_token.is_none() {
                 self.request_auth_token().await?;
             }
-            
+
             self.toc().await?;
             Ok(())
         } else {
@@ -909,7 +909,7 @@ impl Gpapi {
             let resp = self
                 .execute_request("acceptTos", None, Some(&form_body.into_bytes()), self.get_default_headers()?)
                 .await?;
-            
+
             if let Some(payload) = resp.payload {
                 Ok(payload.accept_tos_response)
             } else {
