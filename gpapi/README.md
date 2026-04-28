@@ -77,6 +77,20 @@ println!("{:?}", download_info);
 api.download("com.instagram.android", None, true, true, true, &Path::new("/tmp/testing"), None).await;
 ```
 
+## Advanced Options
+
+### Custom Device Properties
+
+If you wish to specify a custom device properties file (e.g. one you've exported from Aurora
+Store's spoof manager):
+
+```rust
+let mut api = Gpapi::from_device_properties_file("default", &email, "/path/to/device.properties");
+```
+
+If multiple devices are specified in the file, replace "default" with the device name you've
+specified in the section header.  You can reference the default [device properties file](https://github.com/EFForg/rs-google-play/blob/master/gpapi/device.properties).
+
 ## Docs
 
 Documentation for this crate can be found on [docs.rs](https://docs.rs/gpapi/).
