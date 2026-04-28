@@ -22,6 +22,7 @@ bincode = "2"
 futures = "0.3"
 tokio-dl-stream-to-disk = "1"
 serde = { version = "1", features = ["derive"] }
+configparser = "3"
 
 [build-dependencies]
 googleplay-protobuf = "3"

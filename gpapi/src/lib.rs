@@ -88,11 +88,8 @@ use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use bytes::Bytes;
+use configparser::ini::Ini;
 use futures::future::TryFutureExt;
-//use hyper::client::HttpConnector;
-//use hyper::header::{HeaderName as HyperHeaderName, HeaderValue as HyperHeaderValue};
-//use hyper::{Body, Client, Method, Request};
-//use hyper_tls::HttpsConnector;
 use prost::Message;
 use reqwest::header::{HeaderMap, HeaderValue, HeaderName};
 use reqwest::Url;
@@ -102,6 +99,7 @@ use crate::error::{Error as GpapiError, ErrorKind as GpapiErrorKind};
 
 use googleplay_protobuf::{
     AcceptTosResponse,
+    AndroidBuildProto,
     AndroidCheckinProto,
     AndroidCheckinRequest,
     AndroidCheckinResponse,
@@ -109,13 +107,14 @@ use googleplay_protobuf::{
     BulkDetailsResponse,
     DetailsResponse,
     DeviceConfigurationProto,
+    DeviceFeature,
     ResponseWrapper,
     UploadDeviceConfigRequest,
     UploadDeviceConfigResponse,
 };
 
 use bincode::{Encode, Decode};
-include!("device_properties.rs");
+include!("snippets/device_properties.rs");
 
 static DEVICES_ENCODED: &[u8] = include_bytes!("device_properties.bin");
 
@@ -139,18 +138,12 @@ pub struct Gpapi {
     dfe_cookie: Option<String>,
     gsf_id: Option<i64>,
     client: Box<reqwest::Client>,
-    //hyper_client: Box<hyper::Client<HttpsConnector<HttpConnector>>>,
 }
 
 impl Gpapi {
     /// Returns a Gpapi struct.
     ///
     pub fn new<S: Into<String>>(device_codename: S, email: S) -> Self {
-        //let mut http = HttpConnector::new();
-        //http.enforce_http(false);
-        //let https = HttpsConnector::new_with_connector(http);
-        //let hyper_client = Client::builder().build::<_, hyper::Body>(https);
-
         Gpapi {
             locale: String::from("en_US"),
             timezone: String::from("UTC"),
@@ -172,7 +165,42 @@ impl Gpapi {
             dfe_cookie: None,
             gsf_id: None,
             client: Box::new(reqwest::Client::new()),
-            //hyper_client: Box::new(hyper_client),
+        }
+    }
+
+    pub fn from_device_properties_file<S: Into<String>>(device_codename: S, email: S, device_properties_file: S) -> Self {
+        let mut device_properties_map = HashMap::new();
+        let device_properties_file = device_properties_file.into();
+        if Path::new(&device_properties_file).exists() {
+            let mut config = Ini::new();
+            config
+                .read(fs::read_to_string(&device_properties_file).unwrap())
+                .unwrap();
+
+            for section in config.sections() {
+                let device_properties = DeviceProperties::parse(&config, &section);
+                device_properties_map.insert(section, device_properties);
+            }
+        } else {
+            panic!("Device properties file does not exist.");
+        }
+
+        Gpapi {
+            locale: String::from("en_US"),
+            timezone: String::from("UTC"),
+            device_properties:
+                device_properties_map
+                .remove(&device_codename.into())
+                .expect("Invalid device codename"),
+            email: email.into(),
+            aas_token: None,
+            auth_token: None,
+            device_config_token: None,
+            device_checkin_consistency_token: None,
+            tos_token: None,
+            dfe_cookie: None,
+            gsf_id: None,
+            client: Box::new(reqwest::Client::new()),
         }
     }
 
