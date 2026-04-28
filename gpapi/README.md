@@ -26,7 +26,7 @@ use gpapi::Gpapi;
 
 #[tokio::main]
 async fn main() {
-    let mut api = Gpapi::new("ad_g3_pro", &email);
+    let mut api = Gpapi::new("sm_a13_5g", &email);
     api.request_aas_token(oauth_token).await.unwrap();
     println!("{:?}", api.get_aas_token());
 }
@@ -39,7 +39,7 @@ use gpapi::Gpapi;
 
 #[tokio::main]
 async fn main() {
-    let mut api = Gpapi::new("px_7a", &email);
+    let mut api = Gpapi::new("px_9a", &email);
     api.set_aas_token(aas_token);
     api.login().await.unwrap();
     // do something
@@ -56,7 +56,7 @@ use gpapi::Gpapi;
 
 #[tokio::main]
 async fn main() {
-    let mut api = Gpapi::new("px_7a", &email);
+    let mut api = Gpapi::new("px_9a", &email);
     api.set_auth_token(auth_token); // AUTH tokens typically start with "ya29."
     api.login().await.unwrap();
     // do something
