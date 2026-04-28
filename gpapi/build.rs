@@ -21,7 +21,7 @@ fn main() {
         let mut device_properties_map = HashMap::new();
         for section in config.sections() {
             let device_properties_encoded = DeviceProperties::parse(&config, &section).to_encoded();
-            device_properties_map.insert(section.replace("gplayapi_", "").replace(".properties", ""), device_properties_encoded);
+            device_properties_map.insert(section, device_properties_encoded);
         }
 
         let devices_encoded: Vec<u8> = bincode::encode_to_vec(&device_properties_map, bincode::config::standard()).unwrap();
